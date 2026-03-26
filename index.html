@@ -397,27 +397,33 @@ function buildPrompt(){
   const base=BASES.find(b=>b.id===S.base);
   const allF=[...FTABS.heroes,...FTABS.fillers,...FTABS.trails];
   const entries=Object.entries(S.sel);
-  const vp=VIEW_PROMPTS[S.view]||VIEW_PROMPTS.arch;
-  const bp=base?base.prompt:'covered entirely with flowers';
-  const heroes=[],fillers=[],trails=[];
+
+  // Short shape description
+  const shapes={heart:'heart shaped floral arch',arch:'wedding arch covered in flowers',tall:'tall floral column aisle marker',low:'low wide floral table centrepiece'};
+  const shape=shapes[S.view]||'wedding arch';
+
+  // Base
+  const baseDesc=base?base.prompt:'lush flowers';
+
+  // Flowers — keep it short
+  const flowerParts=[];
   entries.forEach(([id,sel])=>{
     const f=allF.find(x=>x.id===id);if(!f) return;
     const cols=COL[id]||[];
-    const cl=cols.find(c=>c.id===sel.colour)?.l||sel.colour;
-    const desc=`${cl.toLowerCase()} ${f.prompt}`;
-    if(FTABS.heroes.find(h=>h.id===id)) heroes.push(desc);
-    else if(FTABS.fillers.find(h=>h.id===id)) fillers.push(desc);
-    else trails.push(desc);
+    const cl=cols.find(c=>c.id===sel.colour)?.l||'';
+    flowerParts.push((cl?cl+' ':'')+f.prompt);
   });
-  let fd='';
-  if(heroes.length) fd+=`The hero flowers are ${heroes.join(', ')}. `;
-  if(fillers.length) fd+=`Filler flowers include ${fillers.join(', ')}. `;
-  if(trails.length) fd+=`Trailing elements include ${trails.join(', ')} cascading down elegantly. `;
-  const quality='Every single inch of the arch is densely packed with flowers, absolutely no gaps visible anywhere, blooms overlapping naturally and luxuriously. Cinematic soft natural lighting, shallow depth of field, ultra sharp floral detail, 4K wedding editorial photography. No people, no text, no watermarks.';
-  return `${vp} ${bp}. ${fd}${quality}`;
+
+  const flowerStr=flowerParts.slice(0,5).join(', ');
+
+  // Keep total prompt under 400 chars
+  const prompt='Photorealistic '+shape+', '+baseDesc+(flowerStr?', with '+flowerStr:'')+', densely packed flowers no gaps, luxury wedding photography, soft lighting, 4K, no text';
+  
+  // Truncate if still too long
+  return prompt.length>500?prompt.substring(0,500):prompt;
 }
 
-// ═══════════ GENERATE ═══════════
+
 async function generateImage(){
   if(S.busy) return;
   if(!S.base){toast('Select a base first');return;}
@@ -430,24 +436,23 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    document.getElementById('loading-sub').textContent='Generating your arrangement... please wait 20-40 seconds';
+    document.getElementById('loading-sub').textContent='Generating... this takes 20-40 seconds';
     
-    // Pollinations AI - free, no key, CORS-safe GET request
-    // Just set the image src directly - browser loads it like any image
-    const encoded = encodeURIComponent(prompt);
+    const encoded = encodeURIComponent(buildPrompt());
     const seed = Math.floor(Math.random()*99999);
-    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux-realism&nologo=true';
+    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux-realism&nologo=true&private=true';
     
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error('Generation failed - Pollinations may be busy. Please try again in a few seconds.'));
-      setTimeout(() => reject(new Error('Timed out after 90 seconds. Please try again.')), 90000);
-      img.src = imgUrl;
+    // Set image src directly — Pollinations returns image like a normal URL
+    const imgEl = document.getElementById('gen-img');
+    
+    await new Promise((resolve,reject)=>{
+      imgEl.onload = resolve;
+      imgEl.onerror = ()=>reject(new Error('Could not load image. Please try again.'));
+      setTimeout(()=>reject(new Error('Timed out - please try again')),90000);
+      imgEl.src = imgUrl;
     });
     
     S.lastImg = imgUrl;
-    document.getElementById('gen-img').src = imgUrl;
     showState('image');
     stopProgress(100);
     toast('Image generated!');
