@@ -430,31 +430,32 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    document.getElementById('loading-sub').textContent='Generating your arrangement... please wait 15-30 seconds';
+    document.getElementById('loading-sub').textContent='Generating your arrangement... please wait 20-40 seconds';
     
-    // Pollinations AI - 100% free, no API key, no CORS issues, works from any browser
+    // Pollinations AI - free, no key, CORS-safe GET request
+    // Just set the image src directly - browser loads it like any image
     const encoded = encodeURIComponent(prompt);
     const seed = Math.floor(Math.random()*99999);
-    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux&nologo=true&enhance=true';
+    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux-realism&nologo=true';
     
-    // Load image via Image element to handle CORS properly
     await new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = resolve;
-      img.onerror = () => reject(new Error('Image generation failed. Pollinations may be busy - please try again.'));
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Generation failed - Pollinations may be busy. Please try again in a few seconds.'));
+      setTimeout(() => reject(new Error('Timed out after 90 seconds. Please try again.')), 90000);
       img.src = imgUrl;
-      // Timeout after 60 seconds
-      setTimeout(() => reject(new Error('Timed out after 60 seconds. Please try again.')), 60000);
     });
     
     S.lastImg = imgUrl;
     document.getElementById('gen-img').src = imgUrl;
-    showState('image');stopProgress(100);toast('Image generated!');
+    showState('image');
+    stopProgress(100);
+    toast('Image generated!');
     
   }catch(err){
-    document.getElementById('error-msg').textContent=err.message;
-    showState('error');stopProgress(0);
+    document.getElementById('error-msg').textContent = err.message;
+    showState('error');
+    stopProgress(0);
   }finally{
     S.busy=false;updateBtn();
   }
