@@ -436,26 +436,23 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    document.getElementById('loading-sub').textContent='Generating... this takes 20-40 seconds';
+    document.getElementById('loading-sub').textContent='Generating... please wait 20-40 seconds';
     
-    const encoded = encodeURIComponent(buildPrompt());
+    const prompt = buildPrompt();
+    const encoded = encodeURIComponent(prompt);
     const seed = Math.floor(Math.random()*99999);
-    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux-realism&nologo=true&private=true';
+    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux-realism&nologo=true';
     
-    // Set image src directly — Pollinations returns image like a normal URL
-    const imgEl = document.getElementById('gen-img');
-    
-    await new Promise((resolve,reject)=>{
-      imgEl.onload = resolve;
-      imgEl.onerror = ()=>reject(new Error('Could not load image. Please try again.'));
-      setTimeout(()=>reject(new Error('Timed out - please try again')),90000);
-      imgEl.src = imgUrl;
-    });
-    
+    // Display image directly — no fetch, no CORS issues
+    // Pollinations returns image via GET so we just set src and show it
     S.lastImg = imgUrl;
+    const imgEl = document.getElementById('gen-img');
+    imgEl.src = imgUrl;
+    
+    // Show image panel immediately — it will load progressively
     showState('image');
     stopProgress(100);
-    toast('Image generated!');
+    toast('Rendering your arrangement...');
     
   }catch(err){
     document.getElementById('error-msg').textContent = err.message;
