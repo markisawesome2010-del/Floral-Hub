@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floral Hub Jamaica — AI Design Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#b8914a;--gold-light:#e2c97a;--ink:#0e0c0a;--panel:#111009;--border:#1e1c18;--muted:#555;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--ink);font-family:'Outfit',sans-serif;color:#ccc;}
+
+header{height:54px;background:#0a0908;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.18rem;color:var(--gold-light);font-weight:300;letter-spacing:.08em;}
+.logo em{color:var(--gold);font-style:italic;}
+.logo-sub{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.hrow{display:flex;gap:8px;align-items:center;}
+.hbtn{padding:7px 16px;border-radius:5px;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;border:1px solid var(--border);background:transparent;color:var(--muted);}
+.hbtn:hover{border-color:var(--gold);color:var(--gold-light);}
+.api-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:#0a0908;cursor:pointer;transition:all .2s;}
+.api-pill:hover{border-color:var(--gold);}
+.api-dot{width:7px;height:7px;border-radius:50%;background:#444;transition:background .3s;}
+.api-dot.on{background:#5a9a5a;}
+.api-pill-text{font-size:.62rem;color:var(--muted);letter-spacing:.08em;}
+
+.workspace{display:flex;height:calc(100vh - 54px);}
+
+/* LEFT */
+.left{width:272px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:9px 2px;font-size:.57rem;letter-spacing:.13em;text-transform:uppercase;text-align:center;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'Outfit',sans-serif;transition:all .2s;border-bottom:2px solid transparent;}
+.tab.on{color:var(--gold-light);border-bottom-color:var(--gold);}
+.pbody{flex:1;overflow-y:auto;padding:12px;}
+.pbody::-webkit-scrollbar{width:3px;}
+.pbody::-webkit-scrollbar-thumb{background:#2a2820;}
+.stitle{font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:13px 0 7px;}
+.stitle:first-child{margin-top:0;}
+
+.bopt{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;border:1.5px solid #1e1c18;background:#0a0908;cursor:pointer;transition:all .2s;margin-bottom:5px;}
+.bopt:hover{border-color:#3a3820;}.bopt.on{border-color:var(--gold);background:#1a1810;}
+.bopt-icon{font-size:1.1rem;}.bopt-name{font-size:.73rem;color:#bbb;font-weight:500;}.bopt-sub{font-size:.6rem;color:var(--muted);margin-top:1px;}
+
+.fitem{border-radius:7px;border:1.5px solid #1e1c18;background:#0a0908;margin-bottom:4px;overflow:hidden;transition:border-color .2s;}
+.fitem.on{border-color:var(--gold);}
+.fhead{display:flex;align-items:center;gap:7px;padding:8px 9px;cursor:pointer;}
+.fhead:hover .fname{color:var(--gold-light);}
+.fname{font-size:.72rem;color:#aaa;flex:1;}
+.fbadge{font-size:.54rem;padding:2px 5px;border-radius:7px;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0;}
+.bh{background:#3a1818;color:#d08080;}.bf{background:#182e18;color:#70b870;}.bt{background:#18182e;color:#8090c8;}.bw{background:#302000;color:#c89030;}
+.abtn{width:22px;height:22px;border-radius:50%;border:1.5px solid #3a3820;background:transparent;color:#666;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.abtn.on{background:var(--gold);border-color:var(--gold);color:#fff;}
+.cstrip{padding:2px 9px 7px;display:flex;flex-wrap:wrap;gap:5px;}
+.csw{width:17px;height:17px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.csw:hover{transform:scale(1.2);}.csw.on{border-color:#fff;box-shadow:0 0 0 1.5px var(--gold);}
+.qrow{display:flex;align-items:center;gap:5px;padding:0 9px 8px;}
+.qlbl{font-size:.57rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;flex:1;}
+.qb{width:19px;height:19px;border-radius:50%;border:1px solid #2a2820;background:transparent;color:#666;cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.qb:hover{border-color:var(--gold);color:var(--gold-light);}
+.qn{font-size:.77rem;color:#bbb;min-width:17px;text-align:center;}.qmax{font-size:.57rem;color:#333;}
+
+.gen-area{padding:12px;border-top:1px solid var(--border);flex-shrink:0;}
+.gen-btn{width:100%;padding:14px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#a07d3a);border:none;color:#fff;font-family:'Cormorant Garamond',serif;font-size:1.08rem;letter-spacing:.12em;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:400;}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(184,145,74,.35);}
+.gen-btn:disabled{background:#1a1810;color:#444;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* MIDDLE */
+.mid{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.ctbar{display:flex;align-items:center;justify-content:space-between;padding:8px 18px;background:rgba(0,0,0,.5);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;}
+.vbtns{display:flex;gap:5px;}
+.vbtn{padding:5px 13px;border-radius:18px;border:1px solid #2a2820;background:transparent;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.vbtn.on{background:rgba(184,145,74,.15);border-color:var(--gold);color:var(--gold-light);}
+.canvas-stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 55%,#181410 0%,#080604 100%);}
+
+/* EMPTY */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:40px;max-width:380px;}
+.empty-icon{font-size:3rem;opacity:.1;}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--gold-light);opacity:.4;font-weight:300;}
+.empty-sub{font-size:.7rem;color:var(--muted);line-height:1.65;opacity:.65;}
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:4px;text-align:left;width:100%;}
+.step{display:flex;align-items:flex-start;gap:10px;}
+.snum{width:20px;height:20px;border-radius:50%;background:#1a1810;border:1px solid #2a2820;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.stxt{font-size:.68rem;color:var(--muted);line-height:1.5;}
+
+/* LOADING */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;}
+.ring{width:56px;height:56px;border-radius:50%;border:2px solid #2a2820;border-top-color:var(--gold);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--gold-light);font-weight:300;}
+.loading-sub{font-size:.7rem;color:var(--muted);max-width:280px;line-height:1.65;}
+.progress-bar{width:240px;height:3px;background:#1a1810;border-radius:2px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;width:0%;transition:width .5s ease;}
+.dots{display:flex;gap:5px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dp 1.4s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes dp{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ERROR */
+.error-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:32px;max-width:380px;}
+.error-icon{font-size:2.5rem;}
+.error-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#d07070;}
+.error-msg{font-size:.7rem;color:var(--muted);line-height:1.65;max-width:320px;}
+.error-retry{padding:8px 20px;border-radius:5px;background:transparent;border:1px solid #3a2020;color:#c07070;font-family:'Outfit',sans-serif;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:4px;}
+.error-retry:hover{background:#2a1515;}
+
+/* IMAGE */
+.img-wrap{position:relative;max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;}
+.gen-img{max-width:100%;max-height:calc(100vh - 165px);border-radius:10px;object-fit:contain;box-shadow:0 20px 80px rgba(0,0,0,.7);animation:imgIn .5s ease;}
+@keyframes imgIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.img-btns{position:absolute;bottom:14px;right:14px;display:flex;gap:8px;}
+.img-btn{padding:7px 14px;border-radius:5px;font-size:.63rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.65);color:#ccc;backdrop-filter:blur(8px);}
+.img-btn:hover{background:rgba(184,145,74,.3);border-color:var(--gold);color:var(--gold-light);}
+
+/* RIGHT */
+.right{width:200px;flex-shrink:0;background:#0d0b09;border-left:1px solid var(--border);display:flex;flex-direction:column;}
+.rhead{padding:11px 13px 8px;font-size:.57rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.rlist{flex:1;overflow-y:auto;padding:9px;}
+.rlist::-webkit-scrollbar{width:3px;}.rlist::-webkit-scrollbar-thumb{background:#2a2820;}
+.rempty{font-size:.66rem;color:#2a2820;text-align:center;padding:28px 0;font-style:italic;}
+.si{display:flex;align-items:center;gap:6px;padding:6px;border-radius:6px;background:#131110;margin-bottom:4px;}
+.si-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.12);}
+.si-n{font-size:.66rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.si-d{font-size:.57rem;color:var(--muted);margin-top:1px;}
+.si-rm{font-size:.7rem;color:#2a2820;cursor:pointer;transition:color .15s;margin-left:auto;flex-shrink:0;}
+.si-rm:hover{color:#c06060;}
+.rbriefbtn{margin:9px;padding:10px;border-radius:5px;background:transparent;border:1px solid #2a2820;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.rbriefbtn:hover{border-color:var(--gold);color:var(--gold-light);}
+
+/* HF MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:flex;align-items:center;justify-content:center;}
+.hf-box{background:#111009;border:1px solid #2a2820;border-radius:14px;width:480px;padding:34px;box-shadow:0 32px 80px rgba(0,0,0,.7);}
+.hf-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold-light);margin-bottom:6px;}
+.hf-sub{font-size:.72rem;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+.hf-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.hf-step{display:flex;gap:12px;align-items:flex-start;}
+.hf-step-num{width:22px;height:22px;border-radius:50%;background:rgba(184,145,74,.15);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.hf-step-txt{font-size:.72rem;color:#bbb;line-height:1.6;}
+.hf-step-txt a{color:var(--gold);text-decoration:none;}.hf-step-txt a:hover{text-decoration:underline;}
+.hf-step-txt code{background:#0a0908;padding:2px 7px;border-radius:4px;font-size:.65rem;color:#88c878;border:1px solid #2a2820;}
+.inp-wrap{position:relative;margin-bottom:10px;}
+.hf-inp{width:100%;padding:12px 44px 12px 14px;border-radius:7px;background:#0a0908;border:1.5px solid #2a2820;color:#ccc;font-family:'Outfit',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s;}
+.hf-inp:focus{border-color:var(--gold);}
+.hf-inp::placeholder{color:#2a2820;}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#555;cursor:pointer;font-size:.9rem;transition:color .2s;}
+.eye:hover{color:var(--gold-light);}
+.hf-note{font-size:.64rem;color:#444;line-height:1.6;margin-bottom:22px;}
+.hf-btns{display:flex;gap:8px;justify-content:flex-end;}
+.hf-btn{padding:10px 22px;border-radius:5px;font-family:'Outfit',sans-serif;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.hf-ghost{background:transparent;border:1px solid #2a2820;color:var(--muted);}.hf-ghost:hover{border-color:#555;}
+.hf-gold{background:var(--gold);border:none;color:#fff;font-weight:500;}.hf-gold:hover{background:#a07d3a;}
+
+/* BRIEF MODAL */
+.mbox{background:#faf7f2;border-radius:13px;width:500px;max-height:78vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.6);}
+.mhead{background:#0e0c0a;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:13px 13px 0 0;}
+.mhtitle{font-family:'Cormorant Garamond',serif;color:var(--gold-light);font-size:1.2rem;}
+.mclose{background:transparent;border:none;color:#666;font-size:1rem;cursor:pointer;}.mclose:hover{color:#fff;}
+.mbody{padding:20px 24px;}
+.brsec{margin-bottom:16px;}.brtitle{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:500;}
+.brrow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid #e8dece;font-size:.74rem;}
+.brrow:last-child{border-bottom:none;}.brname{flex:1;font-weight:500;}.brqty{font-size:.68rem;color:#7a9a72;font-weight:500;min-width:50px;text-align:right;}
+.brbasebox{padding:11px;background:#f2ece0;border-radius:7px;font-size:.74rem;line-height:1.5;}
+.brstats{display:flex;gap:18px;padding:12px;background:#f2ece0;border-radius:7px;margin-bottom:12px;}
+.brstat-n{font-family:'Cormorant Garamond',serif;font-size:1.6rem;}.brstat-l{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#7a7068;}
+.mfoot{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end;}
+.mfbtn{padding:8px 18px;border-radius:5px;font-family:'Outfit',sans-serif;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.mfg{background:#fff;border:1.5px solid #e8dece;color:#7a7068;}.mfg:hover{border-color:#0e0c0a;}
+.mfs{background:#0e0c0a;border:1.5px solid #0e0c0a;color:#e2c97a;}.mfs:hover{background:#1e1c18;}
+
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(48px);background:#0a0908;color:var(--gold-light);padding:8px 20px;border-radius:5px;font-size:.68rem;transition:transform .28s;z-index:999;pointer-events:none;white-space:nowrap;border:1px solid #2a2820;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Floral Hub <em>Jamaica</em></div>
+    <div class="logo-sub">AI Design Studio · Powered by Hugging Face</div>
+  </div>
+  <div class="hrow">
+    <div class="api-pill" onclick="openHFModal()" id="api-pill">
+      <div class="api-dot" id="api-dot"></div>
+      <span class="api-pill-text" id="api-pill-text">Connect Free API Key</span>
+    </div>
+    <button class="hbtn" onclick="resetAll()">↺ Reset</button>
+    <button class="hbtn" onclick="showBrief()">Brief</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <aside class="left">
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('base',this)">Base</button>
+      <button class="tab" onclick="switchTab('heroes',this)">Heroes</button>
+      <button class="tab" onclick="switchTab('fillers',this)">Fillers</button>
+      <button class="tab" onclick="switchTab('trails',this)">Trailing</button>
+    </div>
+    <div class="pbody" id="pbody"></div>
+    <div class="gen-area">
+      <button class="gen-btn" id="gen-btn" onclick="generateImage()" disabled>
+        ✦ Generate AI Preview
+      </button>
+    </div>
+  </aside>
+
+  <div class="mid">
+    <div class="ctbar">
+      <div class="vbtns">
+        <button class="vbtn on" onclick="setView('heart',this)">♥ Heart Arch</button>
+        <button class="vbtn" onclick="setView('arch',this)">Classic Arch</button>
+        <button class="vbtn" onclick="setView('tall',this)">Tall Marker</button>
+        <button class="vbtn" onclick="setView('low',this)">Centrepiece</button>
+      </div>
+    </div>
+    <div class="canvas-stage" id="canvas-stage">
+
+      <div class="empty-state" id="st-empty">
+        <div class="empty-icon">🌸</div>
+        <div class="empty-title">Design Your Arrangement</div>
+        <div class="empty-sub">Select your flowers on the left, then Generate — Hugging Face AI creates a photorealistic image of your exact arrangement. Completely free.</div>
+        <div class="steps">
+          <div class="step"><div class="snum">1</div><div class="stxt">Connect your free Hugging Face token (top bar)</div></div>
+          <div class="step"><div class="snum">2</div><div class="stxt">Choose a base — White Cloud, Garden Green, or Tropical</div></div>
+          <div class="step"><div class="snum">3</div><div class="stxt">Add hero flowers and pick your colours</div></div>
+          <div class="step"><div class="snum">4</div><div class="stxt">Hit Generate — photorealistic result in ~20–40 seconds</div></div>
+        </div>
+      </div>
+
+      <div class="loading-wrap" id="st-loading" style="display:none">
+        <div class="ring"></div>
+        <div class="loading-title">Generating Your Arrangement…</div>
+        <div class="loading-sub" id="loading-sub">Stable Diffusion XL is creating your photorealistic floral design. This takes 20–40 seconds on the free tier.</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+
+      <div class="error-wrap" id="st-error" style="display:none">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">Generation Failed</div>
+        <div class="error-msg" id="error-msg">Something went wrong. Check your token and try again.</div>
+        <button class="error-retry" onclick="generateImage()">↺ Try Again</button>
+      </div>
+
+      <div class="img-wrap" id="st-image" style="display:none">
+        <img id="gen-img" class="gen-img" src="" alt="Generated floral arrangement"/>
+        <div class="img-btns">
+          <button class="img-btn" onclick="generateImage()">↺ Regenerate</button>
+          <button class="img-btn" onclick="downloadImg()">↓ Save Image</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <aside class="right">
+    <div class="rhead">Your Selection</div>
+    <div class="rlist" id="rlist"><div class="rempty" id="rempty">Nothing added yet</div></div>
+    <button class="rbriefbtn" onclick="showBrief()">✦ Booking Brief</button>
+  </aside>
+</div>
+
+<!-- HF TOKEN MODAL -->
+<div class="overlay" id="hf-modal" style="display:none">
+  <div class="hf-box">
+    <div class="hf-title">Connect Hugging Face — Free</div>
+    <div class="hf-sub">Generate photorealistic floral arrangements using Stable Diffusion XL. 100% free — no credit card required.</div>
+    <div class="hf-steps">
+      <div class="hf-step">
+        <div class="hf-step-num">1</div>
+        <div class="hf-step-txt">Go to <a href="https://huggingface.co" target="_blank">huggingface.co</a> and sign up for a free account</div>
+      </div>
+      <div class="hf-step">
+        <div class="hf-step-num">2</div>
+        <div class="hf-step-txt">Click your profile picture → <strong style="color:#bbb">Settings</strong> → <strong style="color:#bbb">Access Tokens</strong></div>
+      </div>
+      <div class="hf-step">
+        <div class="hf-step-num">3</div>
+        <div class="hf-step-txt">Click <strong style="color:#bbb">New Token</strong> → name it anything → Role: <code>Read</code> → Create</div>
+      </div>
+      <div class="hf-step">
+        <div class="hf-step-num">4</div>
+        <div class="hf-step-txt">Copy your token (starts with <code>hf_...</code>) and paste it below</div>
+      </div>
+    </div>
+    <div class="inp-wrap">
+      <input type="password" class="hf-inp" id="hf-inp" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+      <button class="eye" onclick="toggleEye()">👁</button>
+    </div>
+    <div class="hf-note">Your token is stored only in this browser session and sent directly to Hugging Face's servers. It is never stored or logged anywhere else.</div>
+    <div class="hf-btns">
+      <button class="hf-btn hf-ghost" onclick="closeHFModal()">Cancel</button>
+      <button class="hf-btn hf-gold" onclick="saveToken()">Connect Free API</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════ DATA ═══════════
+const BASES=[
+  {id:'white',label:'White Cloud',sub:"Baby's breath, gypsophila, ranunculus, wisteria",icon:'☁️',
+   prompt:"completely covered in a dense pure white floral base of tightly packed baby's breath, gypsophila, white ranunculus and cascading white wisteria clusters"},
+  {id:'garden',label:'Garden Green',sub:'Eucalyptus, fern, ivy, wisteria, hydrangea',icon:'🌿',
+   prompt:"covered in a lush romantic European garden-style base of layered eucalyptus sprigs, fern fronds, trailing ivy vines, cascading white wisteria and full white hydrangea heads"},
+  {id:'tropical',label:'Tropical',sub:'Monstera, palm frond, banana leaf',icon:'🌴',
+   prompt:"covered in a bold tropical Jamaican base of large monstera deliciosa leaves, palm fronds, banana leaf, and bird of paradise foliage"},
+  {id:'mono',label:'Monochromatic',sub:'Flowers only — dark to light gradient',icon:'🎨',
+   prompt:"packed with flowers graduated from the darkest shade at the base to the lightest at the top and edges, no separate greenery base"},
+];
+
+const COL={
+  roses:[{id:'white',l:'White',h:'#f8f6f0'},{id:'ivory',l:'Ivory',h:'#f2ecda'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'soft_pink',l:'Soft Pink',h:'#ecaab8'},{id:'peach',l:'Peach',h:'#f4c08c'},{id:'champagne',l:'Champagne',h:'#e8ce94'},{id:'burgundy',l:'Burgundy',h:'#76001e'},{id:'deep_red',l:'Deep Red',h:'#8a0010'}],
+  peonies:[{id:'white',l:'White',h:'#f8f6f0'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'soft_pink',l:'Soft Pink',h:'#ecaab8'},{id:'coral',l:'Coral',h:'#ee7e5c'}],
+  anemone:[{id:'white',l:'White',h:'#f5f4ee'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'deep_purple',l:'Deep Purple',h:'#480076'},{id:'burgundy',l:'Burgundy',h:'#76001e'}],
+  gerbera:[{id:'white',l:'White',h:'#f8f6f0'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'peach',l:'Peach',h:'#f4c08c'},{id:'coral',l:'Coral',h:'#ee7e5c'},{id:'yellow',l:'Yellow',h:'#f8d438'}],
+  scabiosa:[{id:'white',l:'White',h:'#f5f4ee'},{id:'lilac',l:'Soft Lilac',h:'#d2aede'},{id:'purple',l:'Deep Purple',h:'#480076'}],
+  orchids:[{id:'white',l:'White',h:'#f8f6f0'},{id:'purple',l:'Purple',h:'#7628b6'},{id:'pink',l:'Pink',h:'#e874b6'},{id:'magenta',l:'Magenta',h:'#d62494'},{id:'yellow',l:'Yellow',h:'#f8d438'}],
+  dahlias:[{id:'burgundy',l:'Burgundy',h:'#76001e'},{id:'deep_red',l:'Deep Red',h:'#8a0010'},{id:'burnt_orange',l:'Burnt Orange',h:'#be4e00'},{id:'white',l:'White',h:'#f8f6f0'},{id:'peach',l:'Peach',h:'#f4c08c'}],
+  anthurium:[{id:'deep_red',l:'Deep Red',h:'#8a0010'},{id:'pink',l:'Pink',h:'#e874b6'},{id:'white',l:'White',h:'#f8f6f0'},{id:'orange',l:'Orange',h:'#ee6e1e'},{id:'purple',l:'Deep Purple',h:'#480076'}],
+  hydrangea:[{id:'white',l:'White',h:'#f0f0ec'},{id:'blush',l:'Blush',h:'#eabcac'},{id:'sage',l:'Sage Green',h:'#88a876'},{id:'blue',l:'Blue',h:'#6686c6'},{id:'lilac',l:'Lilac',h:'#bea0d6'}],
+  spray_roses:[{id:'white',l:'White',h:'#f8f6f0'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'soft_pink',l:'Soft Pink',h:'#ecaab8'},{id:'peach',l:'Peach',h:'#f4c08c'},{id:'burgundy',l:'Burgundy',h:'#76001e'}],
+  ranunculus:[{id:'white',l:'White',h:'#f8f6f0'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'champagne',l:'Champagne',h:'#e8ce94'},{id:'peach',l:'Peach',h:'#f4c08c'}],
+  dusty_miller:[{id:'silver',l:'Silver Grey',h:'#aeaea0'}],brunia:[{id:'silver',l:'Silver',h:'#b8b8a8'}],
+  wisteria:[{id:'white',l:'White',h:'#f5f4ee'},{id:'lilac',l:'Soft Lilac',h:'#c8a6de'}],
+  ivy:[{id:'green',l:'Green',h:'#3a6e38'}],amaranthus:[{id:'green',l:'Green',h:'#3a6e38'},{id:'burgundy',l:'Burgundy',h:'#76001e'}],
+  sweet_pea:[{id:'white',l:'White',h:'#f5f4ee'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'soft_pink',l:'Soft Pink',h:'#ecaab8'}],
+  delphinium:[{id:'blue',l:'Blue',h:'#465eb6'},{id:'white',l:'White',h:'#f5f4ee'},{id:'purple',l:'Purple',h:'#6e2ea6'}],
+  snapdragon:[{id:'white',l:'White',h:'#f5f4ee'},{id:'pink',l:'Pink',h:'#e874b6'},{id:'yellow',l:'Yellow',h:'#f8d438'}],
+  foxglove:[{id:'white',l:'White',h:'#f5f4ee'},{id:'blush',l:'Blush',h:'#f0bcb0'},{id:'purple',l:'Purple',h:'#6e2ea6'}],
+};
+
+const FTABS={
+  heroes:[
+    {id:'roses',name:'Roses — Large Head',badge:'hero',mA:15,mT:6,mL:5,prompt:'large-head garden roses'},
+    {id:'peonies',name:'Peonies — Full Open',badge:'hero',mA:10,mT:4,mL:3,prompt:'fully open fluffy peonies'},
+    {id:'anemone',name:'Anemone',badge:'hero',mA:5,mT:2,mL:1,prompt:'anemone flowers with dark centres'},
+    {id:'gerbera',name:'Gerbera Daisy',badge:'hero',mA:5,mT:2,mL:1,prompt:'gerbera daisies'},
+    {id:'scabiosa',name:'Scabiosa',badge:'hero',mA:5,mT:2,mL:1,prompt:'scabiosa pincushion flowers'},
+    {id:'orchids',name:'Orchids — Phalaenopsis',badge:'hero',mA:8,mT:3,mL:2,prompt:'phalaenopsis orchids'},
+    {id:'dahlias',name:'Dahlias',badge:'hero',mA:15,mT:6,mL:5,prompt:'large dinner-plate dahlias'},
+    {id:'anthurium',name:'Anthurium',badge:'hero',mA:8,mT:3,mL:2,prompt:'tropical anthurium flowers'},
+  ],
+  fillers:[
+    {id:'hydrangea',name:'Hydrangea Heads',badge:'filler',mA:8,mT:3,mL:3,prompt:'full hydrangea heads'},
+    {id:'spray_roses',name:'Spray Roses',badge:'filler',mA:30,mT:10,mL:8,prompt:'delicate spray roses'},
+    {id:'ranunculus',name:'Ranunculus',badge:'filler',mA:20,mT:8,mL:6,prompt:'layered ranunculus blooms'},
+    {id:'dusty_miller',name:'Dusty Miller',badge:'filler',mA:15,mT:8,mL:6,prompt:'silver dusty miller foliage'},
+    {id:'brunia',name:'Brunia Silver Balls',badge:'filler',mA:12,mT:6,mL:5,prompt:'silver brunia berries'},
+  ],
+  trails:[
+    {id:'wisteria',name:'Wisteria Hanging',badge:'trail',mA:20,mT:5,mL:3,prompt:'cascading wisteria clusters hanging down both sides'},
+    {id:'ivy',name:'Trailing Ivy Vine',badge:'trail',mA:30,mT:10,mL:8,prompt:'trailing ivy vines draping down'},
+    {id:'amaranthus',name:'Amaranthus Hanging',badge:'trail',mA:20,mT:8,mL:6,prompt:'hanging amaranthus drooping downward'},
+    {id:'sweet_pea',name:'Sweet Pea Trailing',badge:'trail',mA:20,mT:8,mL:6,prompt:'sweet pea trailing at the edges'},
+    {id:'delphinium',name:'Delphinium',badge:'trail',mA:0,mT:5,mL:0,prompt:'tall delphinium spires growing upward'},
+    {id:'snapdragon',name:'Snapdragon',badge:'trail',mA:0,mT:5,mL:0,prompt:'tapering snapdragon spikes upward'},
+    {id:'foxglove',name:'Foxglove',badge:'trail',mA:0,mT:5,mL:0,prompt:'tall foxglove bell-shaped stems'},
+  ]
+};
+
+const NR={white:['anthurium','dahlias'],garden:['anthurium','blue'],tropical:[],mono:[]};
+
+const VIEW_PROMPTS={
+  heart:'Photorealistic professional wedding photography of a large freestanding heart-shaped floral arch approximately 7 feet tall, standing upright on two slim elegant metal legs, photographed in a softly lit luxury wedding venue interior with warm ambient lighting',
+  arch:'Photorealistic professional wedding photography of a large freestanding classic curved wedding arch approximately 8 feet tall with two vertical posts and an elegant curved top, standing in a beautiful wedding venue',
+  tall:'Photorealistic professional wedding photography of a tall freestanding floral aisle marker approximately 4 feet tall, with a lush round sphere of flowers at the top on a slim metal stand, used as a wedding aisle decoration',
+  low:'Photorealistic professional wedding photography of a lush wide low floral centrepiece arrangement approximately 18 inches wide and 12 inches tall, sitting on a polished elegant reception table',
+};
+
+// ═══════════ STATE ═══════════
+let S={base:null,view:'heart',sel:{},tab:'base',token:null,lastImg:null,busy:false};
+let progressTimer=null;
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const t=sessionStorage.getItem('fh_hf_token');
+  if(t){S.token=t;updateApiStatus(true);}
+  switchTab('base',document.querySelector('.tab.on'));
+  updateBtn();
+});
+
+// ═══════════ TOKEN ═══════════
+function openHFModal(){document.getElementById('hf-modal').style.display='flex';}
+function closeHFModal(){document.getElementById('hf-modal').style.display='none';}
+function toggleEye(){const i=document.getElementById('hf-inp');i.type=i.type==='password'?'text':'password';}
+function saveToken(){
+  const v=document.getElementById('hf-inp').value.trim();
+  if(!v.startsWith('hf_')){toast('Token must start with hf_');return;}
+  S.token=v;sessionStorage.setItem('fh_hf_token',v);
+  updateApiStatus(true);closeHFModal();updateBtn();toast('Hugging Face connected ✓ Free!');
+}
+function updateApiStatus(ok){
+  document.getElementById('api-dot').className='api-dot'+(ok?' on':'');
+  document.getElementById('api-pill-text').textContent=ok?'HuggingFace Connected ✓':'Connect Free API Key';
+}
+
+// ═══════════ PROMPT BUILDER ═══════════
+function buildPrompt(){
+  const base=BASES.find(b=>b.id===S.base);
+  const allF=[...FTABS.heroes,...FTABS.fillers,...FTABS.trails];
+  const entries=Object.entries(S.sel);
+  const vp=VIEW_PROMPTS[S.view]||VIEW_PROMPTS.arch;
+  const bp=base?base.prompt:'covered entirely with flowers';
+  const heroes=[],fillers=[],trails=[];
+  entries.forEach(([id,sel])=>{
+    const f=allF.find(x=>x.id===id);if(!f) return;
+    const cols=COL[id]||[];
+    const cl=cols.find(c=>c.id===sel.colour)?.l||sel.colour;
+    const desc=`${cl.toLowerCase()} ${f.prompt}`;
+    if(FTABS.heroes.find(h=>h.id===id)) heroes.push(desc);
+    else if(FTABS.fillers.find(h=>h.id===id)) fillers.push(desc);
+    else trails.push(desc);
+  });
+  let fd='';
+  if(heroes.length) fd+=`The hero flowers are ${heroes.join(', ')}. `;
+  if(fillers.length) fd+=`Filler flowers include ${fillers.join(', ')}. `;
+  if(trails.length) fd+=`Trailing elements include ${trails.join(', ')} cascading down elegantly. `;
+  const quality='Every single inch of the arch is densely packed with flowers, absolutely no gaps visible anywhere, blooms overlapping naturally and luxuriously. Cinematic soft natural lighting, shallow depth of field, ultra sharp floral detail, 4K wedding editorial photography. No people, no text, no watermarks.';
+  return `${vp} ${bp}. ${fd}${quality}`;
+}
+
+// ═══════════ GENERATE ═══════════
+async function generateImage(){
+  if(S.busy) return;
+  if(!S.token){openHFModal();return;}
+  if(!S.base){toast('Select a base first');return;}
+  const hasHero=Object.keys(S.sel).some(id=>FTABS.heroes.find(f=>f.id===id));
+  if(!hasHero){toast('Add at least one hero flower');return;}
+
+  S.busy=true;showState('loading');updateBtn();
+  startProgress();
+
+  const prompt=buildPrompt();
+
+  try{
+    // Use Stable Diffusion XL via Hugging Face Inference API
+    const res=await fetch(
+      'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
+      {
+        method:'POST',
+        headers:{
+          'Authorization':'Bearer '+S.token,
+          'Content-Type':'application/json',
+          'x-use-cache':'false',
+        },
+        body:JSON.stringify({
+          inputs:prompt,
+          parameters:{
+            width:1024,
+            height:1024,
+            num_inference_steps:35,
+            guidance_scale:7.5,
+          }
+        })
+      }
+    );
+
+    if(!res.ok){
+      // Model may be loading — retry once after delay
+      if(res.status===503){
+        document.getElementById('loading-sub').textContent='Model is warming up (first run takes ~30s extra). Retrying…';
+        await new Promise(r=>setTimeout(r,20000));
+        return generateImage();
+      }
+      const txt=await res.text();
+      let msg='Generation failed';
+      try{msg=JSON.parse(txt)?.error||msg;}catch(e){}
+      throw new Error(msg);
+    }
+
+    // Response is raw image bytes (blob)
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    S.lastImg=url;
+    document.getElementById('gen-img').src=url;
+    showState('image');
+    stopProgress(100);
+    toast('Image generated ✓');
+
+  }catch(err){
+    let msg=err.message||'Unknown error';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')){
+      msg='Network error. Make sure this file is served from a web server (not opened directly as a file). Try Netlify Drop or CodePen.';
+    }
+    document.getElementById('error-msg').textContent=msg;
+    showState('error');
+    stopProgress(0);
+  }finally{
+    S.busy=false;updateBtn();
+  }
+}
+
+function startProgress(){
+  let pct=0;
+  const fill=document.getElementById('progress-fill');
+  fill.style.width='0%';
+  progressTimer=setInterval(()=>{
+    // Simulate progress — slows as it approaches 90%
+    const remaining=90-pct;
+    pct+=remaining*0.04;
+    fill.style.width=Math.min(pct,90)+'%';
+  },600);
+}
+function stopProgress(final){
+  clearInterval(progressTimer);
+  document.getElementById('progress-fill').style.width=final+'%';
+}
+
+function showState(s){
+  ['st-empty','st-loading','st-error','st-image'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById('st-'+s).style.display='flex';
+}
+
+function downloadImg(){
+  if(!S.lastImg) return;
+  const a=document.createElement('a');a.href=S.lastImg;a.download='floral-hub-design.png';a.click();
+}
+
+function updateBtn(){
+  const btn=document.getElementById('gen-btn');
+  const hasBase=!!S.base;
+  const hasHero=Object.keys(S.sel).some(id=>FTABS.heroes.find(f=>f.id===id));
+  if(S.busy){
+    btn.disabled=true;
+    btn.innerHTML='<div style="width:15px;height:15px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-right:6px;flex-shrink:0"></div>Generating…';
+  }else if(!S.token){btn.disabled=false;btn.innerHTML='🔑 Connect Free API Key';}
+  else if(!hasBase){btn.disabled=true;btn.innerHTML='✦ Select a Base First';}
+  else if(!hasHero){btn.disabled=true;btn.innerHTML='✦ Add a Hero Flower';}
+  else{btn.disabled=false;btn.innerHTML='✦ Generate AI Preview';}
+}
+
+// ═══════════ PANEL ═══════════
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');S.tab=tab;renderPanel(tab);
+}
+function renderPanel(tab){
+  const body=document.getElementById('pbody');
+  if(tab==='base'){renderBasePanel(body);return;}
+  body.innerHTML='';
+  const flowers=FTABS[tab]||[];
+  const mK=S.view==='arch'?'mA':S.view==='tall'?'mT':'mL';
+  flowers.forEach(f=>{
+    if((f[mK]||0)===0) return;
+    const nr=isNR(f.id);const sel=S.sel[f.id];const cols=COL[f.id]||[];
+    const div=document.createElement('div');div.className='fitem'+(sel?' on':'');div.id='fi-'+f.id;
+    div.innerHTML=`<div class="fhead" onclick="toggleF('${f.id}')">
+      <div class="fname">${f.name}</div>
+      ${nr?`<span class="fbadge bw">⚠</span>`:`<span class="fbadge b${f.badge[0]}">${f.badge}</span>`}
+      <button class="abtn${sel?' on':''}" onclick="toggleF('${f.id}');event.stopPropagation()">${sel?'✓':'+'}</button>
+    </div>
+    ${sel?`<div class="cstrip" id="cs-${f.id}">
+      ${cols.map(c=>`<div class="csw${c.id===sel.colour?' on':''}" style="background:${c.h}" title="${c.l}" onclick="pickC('${f.id}','${c.id}','${c.h}',this);event.stopPropagation()"></div>`).join('')}
+    </div>
+    <div class="qrow"><span class="qlbl">Qty</span>
+      <button class="qb" onclick="chQ('${f.id}',-1);event.stopPropagation()">−</button>
+      <span class="qn" id="qn-${f.id}">${sel.qty}</span>
+      <button class="qb" onclick="chQ('${f.id}',1);event.stopPropagation()">+</button>
+      <span class="qmax">/${f[mK]}</span>
+    </div>`:''}`;
+    body.appendChild(div);
+  });
+}
+function renderBasePanel(body){
+  body.innerHTML='<div class="stitle">Choose Foundation</div>';
+  BASES.forEach(b=>{
+    const d=document.createElement('div');d.className='bopt'+(S.base===b.id?' on':'');d.id='bo-'+b.id;
+    d.innerHTML=`<span class="bopt-icon">${b.icon}</span><div><div class="bopt-name">${b.label}</div><div class="bopt-sub">${b.sub}</div></div>`;
+    d.onclick=()=>selBase(b.id);body.appendChild(d);
+  });
+}
+function selBase(id){
+  S.base=id;document.querySelectorAll('.bopt').forEach(e=>e.classList.remove('on'));
+  const el=document.getElementById('bo-'+id);if(el) el.classList.add('on');updateBtn();toast(`Base: ${BASES.find(b=>b.id===id)?.label}`);
+}
+function toggleF(id){
+  if(S.sel[id]){delete S.sel[id];}
+  else{const cols=COL[id]||[];S.sel[id]={colour:cols[0]?.id||'',qty:1,colourHex:cols[0]?.h||'#f0f0e8'};}
+  renderPanel(S.tab);updateSummary();updateBtn();
+}
+function pickC(id,cid,hex,el){
+  if(!S.sel[id]) return;S.sel[id].colour=cid;S.sel[id].colourHex=hex;
+  document.querySelectorAll(`#cs-${id} .csw`).forEach(s=>s.classList.remove('on'));el.classList.add('on');updateSummary();
+}
+function chQ(id,delta){
+  if(!S.sel[id]) return;
+  const allF=[...FTABS.heroes,...FTABS.fillers,...FTABS.trails];const f=allF.find(x=>x.id===id);
+  const mK=S.view==='arch'?'mA':S.view==='tall'?'mT':'mL';const max=f?f[mK]:5;
+  let q=S.sel[id].qty+delta;q=Math.max(1,Math.min(max,q));S.sel[id].qty=q;
+  const el=document.getElementById('qn-'+id);if(el) el.textContent=q;
+  if(q===max&&delta>0) toast(`Max ${max} stems`);
+}
+function isNR(id){if(!S.base) return false;return(NR[S.base]||[]).some(n=>id.includes(n)||n.includes(id));}
+function setView(v,el){S.view=v;document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderPanel(S.tab);updateBtn();}
+function updateSummary(){
+  const list=document.getElementById('rlist');const empty=document.getElementById('rempty');
+  const allF=[...FTABS.heroes,...FTABS.fillers,...FTABS.trails];
+  list.querySelectorAll('.si').forEach(e=>e.remove());
+  const entries=Object.entries(S.sel);if(!entries.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  entries.forEach(([id,sel])=>{
+    const f=allF.find(x=>x.id===id);if(!f) return;
+    const cols=COL[id]||[];const cl=cols.find(c=>c.id===sel.colour)?.l||sel.colour;
+    const d=document.createElement('div');d.className='si';
+    d.innerHTML=`<div class="si-dot" style="background:${sel.colourHex||'#888'}"></div>
+      <div style="flex:1;min-width:0"><div class="si-n">${f.name}</div><div class="si-d">${cl} · ${sel.qty} stem${sel.qty>1?'s':''}</div></div>
+      <span class="si-rm" onclick="rmF('${id}')">✕</span>`;
+    list.appendChild(d);
+  });
+}
+function rmF(id){delete S.sel[id];renderPanel(S.tab);updateSummary();updateBtn();}
+function resetAll(){S.base=null;S.sel={};S.lastImg=null;renderPanel(S.tab);updateSummary();updateBtn();showState('empty');toast('Design reset');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+
+function showBrief(){
+  const allF=[...FTABS.heroes,...FTABS.fillers,...FTABS.trails];
+  const base=BASES.find(b=>b.id===S.base);
+  const entries=Object.entries(S.sel);
+  const heroes=entries.filter(([id])=>FTABS.heroes.find(f=>f.id===id));
+  const fillers=entries.filter(([id])=>FTABS.fillers.find(f=>f.id===id));
+  const trails=entries.filter(([id])=>FTABS.trails.find(f=>f.id===id));
+  const total=entries.reduce((s,[,d])=>s+d.qty,0);
+  const vn={heart:'♥ Heart Arch',arch:'Classic Arch',tall:'Tall Aisle Marker',low:'Low Centrepiece'};
+  const now=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  function br(id,sel){
+    const f=allF.find(x=>x.id===id);if(!f) return'';
+    const cols=COL[id]||[];const cl=cols.find(c=>c.id===sel.colour)?.l||sel.colour;const ch=cols.find(c=>c.id===sel.colour)?.h||'#ccc';
+    return`<div class="brrow"><span class="brname">${f.name}</span><span style="display:flex;align-items:center;gap:3px;font-size:.66rem;color:#7a7068"><span style="width:10px;height:10px;border-radius:50%;background:${ch};border:1px solid #ddd;display:inline-block;flex-shrink:0"></span>${cl}</span>${isNR(id)?'<span style="font-size:.56rem;background:#fff8e0;color:#8a6a20;padding:2px 5px;border-radius:5px;border:1px solid #e8d080">⚠</span>':''}<span class="brqty">${sel.qty} stem${sel.qty>1?'s':''}</span></div>`;
+  }
+  const imgSec=S.lastImg?`<div class="brsec"><div class="brtitle">AI Preview</div><img src="${S.lastImg}" style="width:100%;border-radius:8px;margin-top:4px;"/></div>`:'';
+  const html=`<div class="overlay" onclick="if(event.target===this)closeBrief()"><div class="mbox">
+    <div class="mhead"><div class="mhtitle">Booking Brief</div><button class="mclose" onclick="closeBrief()">✕</button></div>
+    <div class="mbody">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div><div style="font-family:'Cormorant Garamond',serif;font-size:.95rem;color:#2c2c2c">${vn[S.view]||''}</div><div style="font-size:.62rem;color:#7a7068">${now}</div></div>
+        <div class="brstats"><div class="brstat"><div class="brstat-n">${total}</div><div class="brstat-l">Stems</div></div><div class="brstat"><div class="brstat-n">${heroes.length}</div><div class="brstat-l">Heroes</div></div><div class="brstat"><div class="brstat-n">${fillers.length+trails.length}</div><div class="brstat-l">Support</div></div></div>
+      </div>
+      ${imgSec}
+      ${!base&&!entries.length?'<div style="text-align:center;color:#999;padding:24px 0;font-style:italic">Add a base and flowers first.</div>':''}
+      ${base?`<div class="brsec"><div class="brtitle">Base</div><div class="brbasebox"><strong>${base.icon} ${base.label}</strong><br><span style="color:#7a7068;font-size:.72rem">${base.sub}</span></div></div>`:''}
+      ${heroes.length?`<div class="brsec"><div class="brtitle">Tier 4 — Hero Flowers</div>${heroes.map(([id,sel])=>br(id,sel)).join('')}</div>`:''}
+      ${fillers.length?`<div class="brsec"><div class="brtitle">Tier 3 — Fillers</div>${fillers.map(([id,sel])=>br(id,sel)).join('')}</div>`:''}
+      ${trails.length?`<div class="brsec"><div class="brtitle">Tier 2 — Trailing</div>${trails.map(([id,sel])=>br(id,sel)).join('')}</div>`:''}
+    </div>
+    <div class="mfoot"><button class="mfbtn mfg" onclick="closeBrief()">Close</button><button class="mfbtn mfs" onclick="window.print()">🖨 Print Brief</button></div>
+  </div></div>`;
+  const o=document.createElement('div');o.id='bmodal';o.innerHTML=html;document.body.appendChild(o);
+}
+function closeBrief(){const m=document.getElementById('bmodal');if(m)m.remove();}
+</script>
+</body>
+</html>
