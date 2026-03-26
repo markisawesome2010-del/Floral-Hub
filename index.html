@@ -430,31 +430,23 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    document.getElementById('loading-sub').textContent='Connecting to AI... please wait 30-60 seconds';
+    document.getElementById('loading-sub').textContent='Generating your arrangement... please wait 15-30 seconds';
     
-    // Use FLUX.1-schnell Gradio Space - CORS enabled
-    const submitRes = await fetch('https://black-forest-labs-flux-1-schnell.hf.space/run/predict', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({data:[prompt, 0, true, 1024, 1024, 4]})
+    // Pollinations AI - 100% free, no API key, no CORS issues, works from any browser
+    const encoded = encodeURIComponent(prompt);
+    const seed = Math.floor(Math.random()*99999);
+    const imgUrl = 'https://image.pollinations.ai/prompt/'+encoded+'?width=1024&height=1024&seed='+seed+'&model=flux&nologo=true&enhance=true';
+    
+    // Load image via Image element to handle CORS properly
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = resolve;
+      img.onerror = () => reject(new Error('Image generation failed. Pollinations may be busy - please try again.'));
+      img.src = imgUrl;
+      // Timeout after 60 seconds
+      setTimeout(() => reject(new Error('Timed out after 60 seconds. Please try again.')), 60000);
     });
-    
-    if(!submitRes.ok){
-      const txt = await submitRes.text();
-      let m = 'Space error HTTP '+submitRes.status;
-      try{const j=JSON.parse(txt);m=j.error||j.detail||m;}catch(e){}
-      throw new Error(m);
-    }
-    
-    const result = await submitRes.json();
-    let imgUrl = null;
-    if(result.data && result.data[0]){
-      const d = result.data[0];
-      if(typeof d === 'string' && d.startsWith('data:image')) imgUrl = d;
-      else if(d && d.url) imgUrl = d.url;
-      else if(d && d.path) imgUrl = 'https://black-forest-labs-flux-1-schnell.hf.space/file='+d.path;
-    }
-    if(!imgUrl) throw new Error('No image returned. The Space may be busy - please try again.');
     
     S.lastImg = imgUrl;
     document.getElementById('gen-img').src = imgUrl;
