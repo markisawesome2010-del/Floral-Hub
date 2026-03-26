@@ -179,7 +179,7 @@ header{height:54px;background:#0a0908;border-bottom:1px solid var(--border);disp
   <div class="hrow">
     <div class="api-pill" onclick="openHFModal()" id="api-pill">
       <div class="api-dot" id="api-dot"></div>
-      <span class="api-pill-text" id="api-pill-text">Connect Free API Key</span>
+      <span class="api-pill-text" id="api-pill-text">Free AI · No Key Needed</span>
     </div>
     <button class="hbtn" onclick="resetAll()">↺ Reset</button>
     <button class="hbtn" onclick="showBrief()">Brief</button>
@@ -372,8 +372,7 @@ let S={base:null,view:'heart',sel:{},tab:'base',token:null,lastImg:null,busy:fal
 let progressTimer=null;
 
 window.addEventListener('DOMContentLoaded',()=>{
-  const t=sessionStorage.getItem('fh_hf_token');
-  if(t){S.token=t;updateApiStatus(true);}
+  updateApiStatus(true);
   switchTab('base',document.querySelector('.tab.on'));
   updateBtn();
 });
@@ -421,7 +420,6 @@ function buildPrompt(){
 // ═══════════ GENERATE ═══════════
 async function generateImage(){
   if(S.busy) return;
-  if(!S.token){openHFModal();return;}
   if(!S.base){toast('Select a base first');return;}
   const hasHero=Object.keys(S.sel).some(id=>FTABS.heroes.find(f=>f.id===id));
   if(!hasHero){toast('Add at least one hero flower');return;}
@@ -432,42 +430,36 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    const ENDPOINTS=[
-      {url:'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',label:'FLUX Schnell'},
-      {url:'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',label:'SDXL'},
-      {url:'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5',label:'SD 1.5'},
-    ];
-    let lastErr='';let succeeded=false;
-    for(const ep of ENDPOINTS){
-      try{
-        document.getElementById('loading-sub').textContent='Using '+ep.label+'... please wait 20-50 seconds';
-        const res=await fetch(ep.url,{
-          method:'POST',
-          headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json','x-wait-for-model':'true'},
-          body:JSON.stringify({inputs:prompt})
-        });
-        const ct=res.headers.get('content-type')||'';
-        if(!res.ok){
-          const txt=await res.text();
-          let m='HTTP '+res.status;
-          try{const j=JSON.parse(txt);m=j.error||j.message||m;}catch(e){}
-          lastErr=ep.label+': '+m;continue;
-        }
-        if(ct.includes('image')||ct.includes('octet-stream')){
-          const blob=await res.blob();
-          S.lastImg=URL.createObjectURL(blob);
-          document.getElementById('gen-img').src=S.lastImg;
-          showState('image');stopProgress(100);toast('Image generated!');
-          succeeded=true;break;
-        } else {
-          const txt=await res.text();
-          let m='Unexpected response';
-          try{const j=JSON.parse(txt);m=j.error||j.message||JSON.stringify(j).slice(0,120);}catch(e){m=txt.slice(0,120);}
-          lastErr=ep.label+': '+m;continue;
-        }
-      }catch(e){lastErr=ep.label+': '+e.message;continue;}
+    document.getElementById('loading-sub').textContent='Connecting to AI... please wait 30-60 seconds';
+    
+    // Use FLUX.1-schnell Gradio Space - CORS enabled
+    const submitRes = await fetch('https://black-forest-labs-flux-1-schnell.hf.space/run/predict', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({data:[prompt, 0, true, 1024, 1024, 4]})
+    });
+    
+    if(!submitRes.ok){
+      const txt = await submitRes.text();
+      let m = 'Space error HTTP '+submitRes.status;
+      try{const j=JSON.parse(txt);m=j.error||j.detail||m;}catch(e){}
+      throw new Error(m);
     }
-    if(!succeeded) throw new Error(lastErr||'All models failed. Check your Hugging Face token has Write permissions.');
+    
+    const result = await submitRes.json();
+    let imgUrl = null;
+    if(result.data && result.data[0]){
+      const d = result.data[0];
+      if(typeof d === 'string' && d.startsWith('data:image')) imgUrl = d;
+      else if(d && d.url) imgUrl = d.url;
+      else if(d && d.path) imgUrl = 'https://black-forest-labs-flux-1-schnell.hf.space/file='+d.path;
+    }
+    if(!imgUrl) throw new Error('No image returned. The Space may be busy - please try again.');
+    
+    S.lastImg = imgUrl;
+    document.getElementById('gen-img').src = imgUrl;
+    showState('image');stopProgress(100);toast('Image generated!');
+    
   }catch(err){
     document.getElementById('error-msg').textContent=err.message;
     showState('error');stopProgress(0);
@@ -475,7 +467,6 @@ async function generateImage(){
     S.busy=false;updateBtn();
   }
 }
-
 function startProgress(){
   let pct=0;
   const fill=document.getElementById('progress-fill');
