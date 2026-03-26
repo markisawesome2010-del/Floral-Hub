@@ -432,56 +432,82 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    // Use Stable Diffusion XL via Hugging Face Inference API
-    const res=await fetch(
-      'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
-      {
-        method:'POST',
-        headers:{
-          'Authorization':'Bearer '+S.token,
-          'Content-Type':'application/json',
-          'x-use-cache':'false',
-        },
-        body:JSON.stringify({
-          inputs:prompt,
-          parameters:{
-            width:1024,
-            height:1024,
-            num_inference_steps:35,
-            guidance_scale:7.5,
-          }
-        })
-      }
-    );
+    // Try multiple models in order — fall back if one fails
+    const MODELS=[
+      'stabilityai/stable-diffusion-xl-base-1.0',
+      'runwayml/stable-diffusion-v1-5',
+      'CompVis/stable-diffusion-v1-4',
+    ];
 
-    if(!res.ok){
-      // Model may be loading — retry once after delay
-      if(res.status===503){
-        document.getElementById('loading-sub').textContent='Model is warming up (first run takes ~30s extra). Retrying…';
-        await new Promise(r=>setTimeout(r,20000));
-        return generateImage();
+    let lastErr='';
+    let succeeded=false;
+
+    for(const model of MODELS){
+      try{
+        document.getElementById('loading-sub').textContent=`Trying model: ${model.split('/')[1]}… (20–40 seconds)`;
+        const res=await fetch(
+          `https://api-inference.huggingface.co/models/${model}`,
+          {
+            method:'POST',
+            headers:{
+              'Authorization':'Bearer '+S.token,
+              'Content-Type':'application/json',
+            },
+            body:JSON.stringify({
+              inputs:prompt,
+              parameters:{num_inference_steps:30,guidance_scale:7.5}
+            })
+          }
+        );
+
+        if(res.status===503){
+          // Model loading — wait and retry same model once
+          document.getElementById('loading-sub').textContent=`Model warming up, waiting 20s then retrying…`;
+          await new Promise(r=>setTimeout(r,20000));
+          const res2=await fetch(
+            `https://api-inference.huggingface.co/models/${model}`,
+            {method:'POST',headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json'},
+             body:JSON.stringify({inputs:prompt,parameters:{num_inference_steps:30,guidance_scale:7.5}})}
+          );
+          if(!res2.ok){const t=await res2.text();let m='Failed';try{m=JSON.parse(t)?.error||m;}catch(e){}lastErr=`${model}: ${m} (${res2.status})`;continue;}
+          const blob2=await res2.blob();
+          if(blob2.type.startsWith('image/')){
+            S.lastImg=URL.createObjectURL(blob2);
+            document.getElementById('gen-img').src=S.lastImg;
+            showState('image');stopProgress(100);toast('Image generated ✓');succeeded=true;break;
+          }
+          continue;
+        }
+
+        if(!res.ok){
+          const txt=await res.text();
+          let m='Failed';try{m=JSON.parse(txt)?.error||m;}catch(e){}
+          lastErr=`${model}: ${m} (${res.status})`;continue;
+        }
+
+        const blob=await res.blob();
+        if(!blob.type.startsWith('image/')){
+          const txt=await blob.text();
+          let m='Bad response';try{m=JSON.parse(txt)?.error||m;}catch(e){}
+          lastErr=`${model}: ${m}`;continue;
+        }
+
+        S.lastImg=URL.createObjectURL(blob);
+        document.getElementById('gen-img').src=S.lastImg;
+        showState('image');stopProgress(100);toast('Image generated ✓');
+        succeeded=true;break;
+
+      }catch(e){
+        lastErr=`${model}: ${e.message}`;continue;
       }
-      const txt=await res.text();
-      let msg='Generation failed';
-      try{msg=JSON.parse(txt)?.error||msg;}catch(e){}
-      throw new Error(msg);
     }
 
-    // Response is raw image bytes (blob)
-    const blob=await res.blob();
-    const url=URL.createObjectURL(blob);
-    S.lastImg=url;
-    document.getElementById('gen-img').src=url;
-    showState('image');
-    stopProgress(100);
-    toast('Image generated ✓');
+    if(!succeeded){
+      throw new Error(lastErr||'All models failed. Check your token and try again.');
+    }
 
   }catch(err){
-    let msg=err.message||'Unknown error';
-    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')){
-      msg='Network error. Make sure this file is served from a web server (not opened directly as a file). Try Netlify Drop or CodePen.';
-    }
-    document.getElementById('error-msg').textContent=msg;
+    document.getElementById('error-msg').textContent=err.message||'Unknown error';
     showState('error');
     stopProgress(0);
   }finally{
