@@ -432,84 +432,45 @@ async function generateImage(){
   const prompt=buildPrompt();
 
   try{
-    // Try multiple models in order — fall back if one fails
-    const MODELS=[
-      'stabilityai/stable-diffusion-xl-base-1.0',
-      'runwayml/stable-diffusion-v1-5',
-      'CompVis/stable-diffusion-v1-4',
+    const ENDPOINTS=[
+      {url:'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',label:'FLUX Schnell'},
+      {url:'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',label:'SDXL'},
+      {url:'https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5',label:'SD 1.5'},
     ];
-
-    let lastErr='';
-    let succeeded=false;
-
-    for(const model of MODELS){
+    let lastErr='';let succeeded=false;
+    for(const ep of ENDPOINTS){
       try{
-        document.getElementById('loading-sub').textContent=`Trying model: ${model.split('/')[1]}… (20–40 seconds)`;
-        const res=await fetch(
-          `https://api-inference.huggingface.co/models/${model}`,
-          {
-            method:'POST',
-            headers:{
-              'Authorization':'Bearer '+S.token,
-              'Content-Type':'application/json',
-            },
-            body:JSON.stringify({
-              inputs:prompt,
-              parameters:{num_inference_steps:30,guidance_scale:7.5}
-            })
-          }
-        );
-
-        if(res.status===503){
-          // Model loading — wait and retry same model once
-          document.getElementById('loading-sub').textContent=`Model warming up, waiting 20s then retrying…`;
-          await new Promise(r=>setTimeout(r,20000));
-          const res2=await fetch(
-            `https://api-inference.huggingface.co/models/${model}`,
-            {method:'POST',headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json'},
-             body:JSON.stringify({inputs:prompt,parameters:{num_inference_steps:30,guidance_scale:7.5}})}
-          );
-          if(!res2.ok){const t=await res2.text();let m='Failed';try{m=JSON.parse(t)?.error||m;}catch(e){}lastErr=`${model}: ${m} (${res2.status})`;continue;}
-          const blob2=await res2.blob();
-          if(blob2.type.startsWith('image/')){
-            S.lastImg=URL.createObjectURL(blob2);
-            document.getElementById('gen-img').src=S.lastImg;
-            showState('image');stopProgress(100);toast('Image generated ✓');succeeded=true;break;
-          }
-          continue;
-        }
-
+        document.getElementById('loading-sub').textContent='Using '+ep.label+'... please wait 20-50 seconds';
+        const res=await fetch(ep.url,{
+          method:'POST',
+          headers:{'Authorization':'Bearer '+S.token,'Content-Type':'application/json','x-wait-for-model':'true'},
+          body:JSON.stringify({inputs:prompt})
+        });
+        const ct=res.headers.get('content-type')||'';
         if(!res.ok){
           const txt=await res.text();
-          let m='Failed';try{m=JSON.parse(txt)?.error||m;}catch(e){}
-          lastErr=`${model}: ${m} (${res.status})`;continue;
+          let m='HTTP '+res.status;
+          try{const j=JSON.parse(txt);m=j.error||j.message||m;}catch(e){}
+          lastErr=ep.label+': '+m;continue;
         }
-
-        const blob=await res.blob();
-        if(!blob.type.startsWith('image/')){
-          const txt=await blob.text();
-          let m='Bad response';try{m=JSON.parse(txt)?.error||m;}catch(e){}
-          lastErr=`${model}: ${m}`;continue;
+        if(ct.includes('image')||ct.includes('octet-stream')){
+          const blob=await res.blob();
+          S.lastImg=URL.createObjectURL(blob);
+          document.getElementById('gen-img').src=S.lastImg;
+          showState('image');stopProgress(100);toast('Image generated!');
+          succeeded=true;break;
+        } else {
+          const txt=await res.text();
+          let m='Unexpected response';
+          try{const j=JSON.parse(txt);m=j.error||j.message||JSON.stringify(j).slice(0,120);}catch(e){m=txt.slice(0,120);}
+          lastErr=ep.label+': '+m;continue;
         }
-
-        S.lastImg=URL.createObjectURL(blob);
-        document.getElementById('gen-img').src=S.lastImg;
-        showState('image');stopProgress(100);toast('Image generated ✓');
-        succeeded=true;break;
-
-      }catch(e){
-        lastErr=`${model}: ${e.message}`;continue;
-      }
+      }catch(e){lastErr=ep.label+': '+e.message;continue;}
     }
-
-    if(!succeeded){
-      throw new Error(lastErr||'All models failed. Check your token and try again.');
-    }
-
+    if(!succeeded) throw new Error(lastErr||'All models failed. Check your Hugging Face token has Write permissions.');
   }catch(err){
-    document.getElementById('error-msg').textContent=err.message||'Unknown error';
-    showState('error');
-    stopProgress(0);
+    document.getElementById('error-msg').textContent=err.message;
+    showState('error');stopProgress(0);
   }finally{
     S.busy=false;updateBtn();
   }
